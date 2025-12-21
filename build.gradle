@@ -11,4 +11,14 @@ repositories {
 
 dependencies {
     implementation("org.seleniumhq.selenium:selenium-java:4.39.0")
+
+    // https://mvnrepository.com/artifact/org.testng/testng
+    testImplementation("org.testng:testng:7.11.0")
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true //dùng để tạo report testNG
+        outputDirectory = file("$projectDir/test_output") // folder chứa testNG report
+    }
 }

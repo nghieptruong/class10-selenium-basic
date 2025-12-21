@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selenium Drag and Drop Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+        }
+        #box_source {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50; /* Green */
+            color: white;
+            line-height: 100px;
+            text-align: center;
+            cursor: move;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            border: 2px solid #388E3C;
+        }
+        #box_target {
+            width: 200px;
+            height: 200px;
+            background-color: #f0f0f0;
+            border: 2px dashed #999;
+            margin: 250px auto;
+            line-height: 200px;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+        }
+        #box_target.dropped {
+            background-color: #FFC107; /* Amber */
+            border-color: #FFA000;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Selenium Drag and Drop Demo</h2>
+
+<div id="box_source" draggable="true">Kéo tôi!</div>
+<div id="box_target">Thả vào đây</div>
+
+<script>
+    // JavaScript để xử lý sự kiện kéo thả cơ bản
+    const source = document.getElementById('box_source');
+    const target = document.getElementById('box_target');
+
+    source.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', e.target.id);
+    });
+
+    target.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+
+    target.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        const draggedElement = document.getElementById(data);
+        if (draggedElement) {
+            target.appendChild(draggedElement);
+            target.classList.add('dropped');
+            target.textContent = 'Đã thả thành công!';
+            draggedElement.style.position = 'relative'; // Reset position
+            draggedElement.style.top = '0';
+            draggedElement.style.left = '0';
+        }
+    });
+</script>
+
+</body>
+</html>

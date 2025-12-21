@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demo: invisibilityOfElementLocated</title>
+    <style>
+        :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+        body { display: grid; place-items: start center; gap: 16px; padding: 24px; }
+        .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .log { border: 1px solid #ddd; border-radius: 10px; padding: 10px; width: min(800px, 90vw);
+               height: 140px; overflow: auto; background: #fafafa; }
+        .box { width: 220px; height: 60px; border-radius: 12px; display: grid; place-items: center;
+               background: #e6ffe6; border: 2px solid #5cb85c; }
+        .hidden { display: none; }
+        button { padding: 8px 12px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; }
+        button:active { transform: translateY(1px); }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<h1>invisibilityOfElementLocated demo</h1>
+<p>
+    Trang này bắt đầu với một phần tử <code>visible</code>.
+    Sau khi nhấn <strong>Start</strong>, phần tử sẽ biến mất sau <strong>3s</strong> (bằng cách <code>display: none</code>).
+    Đây là tình huống để minh họa <code>invisibilityOfElementLocated</code> trong Selenium.
+</p>
+
+<div class="row">
+    <button id="start">Start (hide after 3s)</button>
+    <button id="hideNow">Hide now</button>
+    <button id="show">Show again</button>
+    <button id="remove">Remove element</button>
+</div>
+
+<div class="row" id="container">
+    <div id="target" class="box">I am visible</div>
+</div>
+
+<div class="log" id="log" aria-live="polite"></div>
+
+<script>
+    const log = (msg) => {
+      const el = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML += `[${time}] ${msg}<br/>`;
+      el.scrollTop = el.scrollHeight;
+    };
+
+    const target = document.getElementById('target');
+    const container = document.getElementById('container');
+
+    function start() {
+      log('Timer started. Element will be hidden after 3s.');
+      setTimeout(() => {
+        if (target && target.parentElement) {
+          target.classList.add('hidden');
+          log('Element is now hidden → invisibilityOfElementLocated can succeed.');
+        }
+      }, 3000);
+    }
+
+    function hideNow() {
+      if (target && target.parentElement) {
+        target.classList.add('hidden');
+        log('Element hidden immediately.');
+      }
+    }
+
+    function show() {
+      if (target && target.parentElement) {
+        target.classList.remove('hidden');
+        log('Element is visible again.');
+      } else {
+        container.appendChild(target);
+        target.classList.remove('hidden');
+        log('Element re-added and visible again.');
+      }
+    }
+
+    function removeEl() {
+      if (target && target.parentElement) {
+        target.remove();
+        log('Element removed from DOM → invisibilityOfElementLocated can also succeed.');
+      }
+    }
+
+    document.getElementById('start').addEventListener('click', start);
+    document.getElementById('hideNow').addEventListener('click', hideNow);
+    document.getElementById('show').addEventListener('click', show);
+    document.getElementById('remove').addEventListener('click', removeEl);
+
+    log('Initial state: Element is visible.');
+</script>
+</body>
+</html>

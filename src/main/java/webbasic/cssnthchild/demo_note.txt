@@ -1,0 +1,7 @@
+# page1 - This is an example html to demo css "nth-child()" with same tag
+li:nth-child(3)
+
+# page2 - This is an example html to demo css "nth-child()" with different tags
+li:nth-child(3)  // select at index
+li:nth-of-type(3) // select same type
+

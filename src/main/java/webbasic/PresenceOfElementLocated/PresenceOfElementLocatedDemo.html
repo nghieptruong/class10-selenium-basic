@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minh họa PresenceOfElementLocated với WebDriverWait</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #delayed-element {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            display: none;
+        }
+        .code-example {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .success { color: green; }
+        .loading { color: blue; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Minh họa PresenceOfElementLocated với WebDriverWait</h1>
+    
+    <div class="container">
+        <h2>Giới thiệu</h2>
+        <p>Trong Selenium, <code>presenceOfElementLocated</code> là một điều kiện được sử dụng với WebDriverWait để chờ cho đến khi một phần tử xuất hiện trong DOM của trang.</p>
+        <p>Không giống như <code>visibilityOfElementLocated</code>, <code>presenceOfElementLocated</code> chỉ yêu cầu phần tử tồn tại trong DOM, không nhất thiết phải hiển thị trên giao diện.</p>
+    </div>
+    
+    <div class="container">
+        <h2>Minh họa</h2>
+        <p>Nhấn nút bên dưới để mô phỏng việc tạo một phần tử sau một khoảng thời gian trễ (giống như nhiều trang web hiện đại sử dụng AJAX).</p>
+        
+        <button id="show-element">Tạo phần tử với độ trễ 5 giây</button>
+        <button id="show-hidden-element">Tạo phần tử ẩn</button>
+        
+        <div id="delayed-element">
+            <h3>Phần tử được tạo ra!</h3>
+            <p>Phần tử này được tạo ra sau một khoảng thời gian trễ. WebDriverWait với presenceOfElementLocated sẽ phát hiện phần tử này ngay khi nó xuất hiện trong DOM.</p>
+        </div>
+        
+        <div id="hidden-element" style="display: none;">
+            <h3>Phần tử ẩn</h3>
+            <p>Phần tử này tồn tại trong DOM nhưng bị ẩn. presenceOfElementLocated vẫn sẽ phát hiện phần tử này.</p>
+        </div>
+        
+        <div id="status"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Code ví dụ trong Selenium (Java)</h2>
+        <div class="code-example">
+            <pre>// Khởi tạo WebDriverWait với timeout 10 giây
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+// Chờ đến khi phần tử xuất hiện trong DOM
+// presenceOfElementLocated chỉ kiểm tra sự tồn tại trong DOM, không quan tâm đến khả năng hiển thị
+WebElement element = wait.until(
+    ExpectedConditions.presenceOfElementLocated(By.id("delayed-element"))
+);
+
+// Sau khi phần tử đã xuất hiện, chúng ta có thể thực hiện các thao tác khác
+System.out.println("Phần tử đã được tìm thấy trong DOM!");</pre>
+        </div>
+        
+        <h3>So sánh với visibilityOfElementLocated</h3>
+        <div class="code-example">
+            <pre>// presenceOfElementLocated - chỉ kiểm tra sự tồn tại trong DOM
+wait.until(ExpectedConditions.presenceOfElementLocated(By.id("hidden-element")));
+// Điều này sẽ thành công vì phần tử tồn tại trong DOM
+
+// visibilityOfElementLocated - kiểm tra cả sự tồn tại và khả năng hiển thị
+wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("hidden-element")));
+// Điều này sẽ thất bại vì phần tử bị ẩn (display: none)</pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('show-element').addEventListener('click', function() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<p class="loading">Đang chờ phần tử xuất hiện (mô phỏng WebDriverWait)...</p>';
+            
+            // Mô phỏng độ trễ 5 giây giống như các trang web sử dụng AJAX
+            setTimeout(function() {
+                document.getElementById('delayed-element').style.display = 'block';
+                statusDiv.innerHTML = '<p class="success">Phần tử đã xuất hiện trong DOM! presenceOfElementLocated đã phát hiện thành công.</p>';
+            }, 5000);
+        });
+        
+        document.getElementById('show-hidden-element').addEventListener('click', function() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<p class="success">Phần tử ẩn đã tồn tại trong DOM! presenceOfElementLocated sẽ phát hiện phần tử này ngay lập tức.</p>';
+            document.getElementById('hidden-element').style.display = 'none'; // Vẫn ẩn nhưng tồn tại trong DOM
+        });
+    </script>
+</body>
+</html>

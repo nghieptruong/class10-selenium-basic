@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Implicit Wait Test – Delayed Element</title>
+    <style>
+        :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
+        body { margin: 0; padding: 2rem; background: #0f172a; color: #e5e7eb; }
+        .card { max-width: 760px; margin: 0 auto; background: #111827; border: 1px solid #334155; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+        h1 { margin: 0 0 0.5rem; font-size: 1.4rem; }
+        p { color: #cbd5e1; }
+        code { background: #0b1220; padding: .1rem .35rem; border-radius: .35rem; border: 1px solid #1f2937; }
+        .row { display: flex; gap: .75rem; align-items: center; }
+        .input { padding: .5rem .7rem; border-radius: .6rem; border: 1px solid #334155; background: #0b1220; color: #e5e7eb; }
+        .btn { cursor: pointer; padding: .55rem .8rem; border-radius: .6rem; border: 1px solid #334155; background: #0b1220; color: #e5e7eb; }
+        .btn:hover { filter: brightness(1.15); }
+        .hint { font-size: .9rem; color: #94a3b8; }
+        .loader { display: inline-block; width: 1.05rem; height: 1.05rem; border: 2px solid #94a3b8; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; margin-right: .5rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .stack { display: grid; gap: .75rem; }
+        .mt { margin-top: 1rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Implicit Wait Test – Delayed Element</h1>
+    <p>
+        This page adds a target element to the DOM <strong>after a delay</strong>. Use it to
+        test Selenium <code>Implicit Wait</code> or any wait strategy.
+    </p>
+
+    <div class="stack">
+        <div class="row">
+            <label for="delay">Delay (ms):</label>
+            <input id="delay" class="input" type="number" value="3000" min="0" step="100" />
+            <button id="reload" class="btn" type="button">Reload with delay</button>
+            <button id="spawn" class="btn" type="button">Spawn element now</button>
+        </div>
+        <p class="hint">Tip: You can also control delay via query param <code>?delay=3000</code>.</p>
+    </div>
+
+    <hr class="mt" style="border-color:#1f2937" />
+
+    <div id="status" class="row mt" aria-live="polite">
+        <span class="loader" id="spinner"></span>
+        <span id="status-text">Waiting to insert element…</span>
+    </div>
+
+    <!-- Container where the late element will appear -->
+    <div id="late-container" class="mt"></div>
+
+    <!-- Always-present element for control comparisons -->
+    <div class="mt">
+        <label>Always-present field:</label>
+        <input id="always-present" class="input" placeholder="I am here immediately" />
+    </div>
+
+    <div class="mt hint">
+        Targets you can use in tests:
+        <ul>
+            <li><code>#username</code> – input appears after delay</li>
+            <li><code>#login-btn</code> – button appears after delay</li>
+            <li><code>[data-test="late-form"]</code> – container appears after delay</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    (function () {
+      // Read delay from URL (?delay=ms) or input default
+      const params = new URLSearchParams(location.search);
+      const defaultDelay = parseInt(params.get('delay') || document.getElementById('delay').value, 10) || 0;
+      const statusEl = document.getElementById('status-text');
+      const spinnerEl = document.getElementById('spinner');
+      const container = document.getElementById('late-container');
+
+      let spawned = false; // prevent double-spawn
+
+      function log(msg) { console.log('[ImplicitWaitDemo]', msg); }
+
+      function createLateContent() {
+        if (spawned) return; // idempotent
+        spawned = true;
+        const wrapper = document.createElement('div');
+        wrapper.setAttribute('data-test', 'late-form');
+        wrapper.className = 'stack';
+        wrapper.innerHTML = `
+          <label for="username">Username (appeared late)</label>
+          <input id="username" class="input" placeholder="type here" />
+          <button id="login-btn" class="btn" type="button">Login</button>
+        `;
+        container.appendChild(wrapper);
+        statusEl.textContent = 'Element inserted!';
+        spinnerEl.classList.add('hidden');
+        log('Late content inserted into DOM');
+      }
+
+      // Spawn after delay on initial load
+      statusEl.textContent = `Waiting ${defaultDelay} ms to insert element…`;
+      setTimeout(createLateContent, defaultDelay);
+
+      // Controls
+      document.getElementById('reload').addEventListener('click', () => {
+        const delay = parseInt(document.getElementById('delay').value, 10) || 0;
+        location.search = `?delay=${delay}`;
+      });
+
+      document.getElementById('spawn').addEventListener('click', () => {
+        createLateContent();
+      });
+
+      // Expose helpers for debugging from DevTools or your test
+      window.__implicitWaitDemo = {
+        forceSpawn: createLateContent,
+        reset() {
+          spawned = false;
+          container.innerHTML = '';
+          spinnerEl.classList.remove('hidden');
+          statusEl.textContent = 'Waiting to insert element…';
+        }
+      };
+
+      log(`Page ready. Will insert late element after ${defaultDelay} ms`);
+    })();
+</script>
+</body>
+</html>

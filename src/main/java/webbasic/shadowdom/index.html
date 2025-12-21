@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shadow DOM Example</title>
+    <style>
+        my-card {
+          display: block;
+          margin: 20px;
+          border: 2px solid #ccc;
+          padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<my-card></my-card>
+
+<script>
+    class MyCard extends HTMLElement {
+      constructor() {
+        super();
+
+        // Create a shadow root
+        const shadow = this.attachShadow({ mode: 'open' });
+
+        // Create content inside shadow DOM
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `
+          <style>
+            div {
+              padding: 10px;
+              background: #f0f0f0;
+              border: 1px solid #999;
+              font-family: Arial;
+            }
+          </style>
+          <div>
+            <h3>Hello from Shadow DOM!</h3>
+            <p>This content is encapsulated.</p>
+          </div>
+        `;
+
+        shadow.appendChild(wrapper);
+      }
+    }
+
+    // Define the custom element
+    customElements.define('my-card', MyCard);
+</script>
+
+</body>
+</html>

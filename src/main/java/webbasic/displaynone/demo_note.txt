@@ -1,0 +1,7 @@
+# This is an example html to demo css with "not" logical
+p:not(.valid)
+
+But CSS :not() only takes a simple selector (not complex logic):
+/* Invalid */
+div:not([class*='disabled'])
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>elementToBeClickable Demo</title>
+    <style>
+        :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+        body { display: grid; place-content: center; min-height: 100vh; background: #f7f7fb; margin: 0; }
+        .card { width: min(680px, 92vw); background: white; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+        h1 { font-size: 1.25rem; margin: 0 0 8px; }
+        p { margin: 6px 0 16px; color: #4a4a55; }
+        .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        button { padding: 10px 16px; border: 0; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        button:disabled { cursor: not-allowed; opacity: .6; }
+        .btn-primary { background: #1f6feb; color: white; }
+        .muted { color: #6b7280; font-size: .95rem; }
+        .status { margin-top: 12px; font-weight: 600; }
+        .overlay-wrap { position: relative; display: inline-block; }
+        .overlay { position: absolute; inset: -6px; background: rgba(0,0,0,.08); border-radius: 12px; display: grid; place-items: center; font-size: .9rem; color: #111; backdrop-filter: blur(1px); }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Demo: <code>elementToBeClickable(By locator)</code></h1>
+    <p>Nút dưới đây <strong>bị vô hiệu hóa</strong> trong vài giây đầu. Sau đó nó được bật, minh họa cho điều kiện <code>elementToBeClickable</code> (phải <em>visible</em> &amp; <em>enabled</em>).</p>
+
+    <div class="row">
+        <button id="delayed-btn" class="btn-primary" disabled>
+            Click me after I become clickable
+        </button>
+        <span class="muted" id="countdown"></span>
+    </div>
+    <div class="status" id="status">Status: waiting…</div>
+
+    <hr style="margin:20px 0; opacity:.25;" />
+
+    <p>Tình huống phụ: phần tử <em>đang enable</em> nhưng bị một overlay che trong thời gian ngắn, khiến click bị chặn.</p>
+    <div class="overlay-wrap">
+        <button id="covered-btn" class="btn-primary">I am covered temporarily</button>
+        <div id="overlay" class="overlay">Overlay (removes soon)</div>
+    </div>
+    <div class="status" id="status2">Covered button: waiting…</div>
+
+    <script>
+        // ===== Example 1: disabled -> enabled =====
+        const btn = document.getElementById('delayed-btn');
+        const status = document.getElementById('status');
+        const countdown = document.getElementById('countdown');
+
+        const enableAfterMs = 3500; // 3.5s
+        let remaining = Math.ceil(enableAfterMs / 1000);
+        countdown.textContent = `(enabled in ${remaining}s)`;
+        const t = setInterval(() => {
+          remaining--;
+          if (remaining > 0) countdown.textContent = `(enabled in ${remaining}s)`;
+        }, 1000);
+
+        setTimeout(() => {
+          btn.disabled = false; // becomes clickable
+          countdown.textContent = '(enabled)';
+          clearInterval(t);
+        }, enableAfterMs);
+
+        btn.addEventListener('click', () => {
+          status.textContent = 'Status: clicked ✅';
+        });
+
+        // ===== Example 2: covered by overlay (click blocked) =====
+        const coveredBtn = document.getElementById('covered-btn');
+        const overlay = document.getElementById('overlay');
+        const status2 = document.getElementById('status2');
+
+        // Remove overlay after a delay to allow clicks
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          status2.textContent = 'Covered button: overlay removed, now clickable ✅';
+        }, 3000);
+
+        coveredBtn.addEventListener('click', () => {
+          status2.textContent = 'Covered button: clicked ✅';
+        });
+    </script>
+</div>
+</body>
+</html>
